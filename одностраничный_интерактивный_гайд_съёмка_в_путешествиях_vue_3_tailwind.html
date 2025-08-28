@@ -1,0 +1,224 @@
+<!-- Tilda HTML Block: вставьте этот код целиком в блок HTML. Без <html>/<head>/<body> -->
+
+<!-- Fonts + Tailwind -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .container{max-width:880px}
+  /* Checkbox (без спецсимволов) */
+  .t-checkbox{position:relative!important;opacity:1!important;appearance:none;-webkit-appearance:none;display:inline-block;vertical-align:top;box-sizing:border-box;place-content:center;width:22px;height:22px;border:2px solid #ec4899;border-radius:.6rem;background:#fff;transition:all .2s;background-clip:padding-box}
+  .t-checkbox:hover{box-shadow:0 0 0 4px rgba(236,72,153,.12)}
+  .t-checkbox:checked{background:#ec4899;border-color:#ec4899}
+  .t-checkbox:checked::after{content:"";width:10px;height:6px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translateY(-1px)}
+  /* Pills */
+  .pill{border-radius:9999px}
+  .pill-active{background:#db2777;color:#fff;box-shadow:0 4px 14px rgba(219,39,119,.25)}
+  .pill-idle{background:#f3f4f6;color:#374151}
+  .pill-idle:hover{background:#e5e7eb}
+  /* Card */
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:1rem}
+  /* Transitions */
+  .fade-enter{opacity:0}
+  .fade-enter-active{opacity:1;transition:opacity .35s ease}
+  /* Gradient bars */
+  .grad{background:linear-gradient(90deg,#ec4899 0%,#ef4444 100%)}
+</style>
+
+<div id="tguide" class="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-red-100 text-slate-900">
+  <!-- Header -->
+  <div class="sticky top-0 z-40 border-b border-white/40 backdrop-blur bg-white/60">
+    <div class="container mx-auto px-4 py-5">
+      <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl p-5 shadow-lg">
+        <h1 class="text-2xl md:text-3xl font-bold mb-1">Чек-листы для съемки путешествий</h1>
+        <p class="text-rose-100 text-sm md:text-base">Три шага: до, во время, после. Прогресс сохраняется локально.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 pb-8">
+    <!-- Progress -->
+    <div class="mt-6 card p-4 md:p-6">
+      <div class="flex justify-between items-center mb-2 text-sm font-medium text-gray-600">
+        <span>Общий прогресс</span>
+        <span id="overallPct">0%</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5">
+        <div id="overallBar" class="grad h-2.5 rounded-full" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex flex-wrap justify-center gap-2 mt-6">
+      <button class="pill px-4 py-2 text-sm font-medium pill-idle" data-tab="pre">До</button>
+      <button class="pill px-4 py-2 text-sm font-medium pill-idle" data-tab="during">Во время</button>
+      <button class="pill px-4 py-2 text-sm font-medium pill-idle" data-tab="post">После</button>
+    </div>
+
+    <!-- Panels -->
+    <div class="mt-6 space-y-8">
+      <!-- PRE -->
+      <div id="panel-pre" class="fade-enter card p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-semibold text-rose-700 mb-4">До путешествия</h2>
+        <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+          <span>Прогресс</span>
+          <div class="w-40 h-2.5 rounded bg-gray-200 overflow-hidden"><div id="preBar" class="grad h-2.5" style="width:0%"></div></div>
+          <span id="prePct" class="tabular-nums">0%</span>
+          <button id="resetPre" class="ml-auto text-xs text-rose-600 hover:underline">Сбросить раздел</button>
+        </div>
+        <ul id="list-pre" class="rounded-lg border border-gray-100 divide-y divide-gray-100"></ul>
+      </div>
+
+      <!-- DURING -->
+      <div id="panel-during" class="hidden fade-enter card p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-semibold text-rose-700 mb-4">Во время путешествия</h2>
+        <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+          <span>Прогресс</span>
+          <div class="w-40 h-2.5 rounded bg-gray-200 overflow-hidden"><div id="duringBar" class="grad h-2.5" style="width:0%"></div></div>
+          <span id="duringPct" class="tabular-nums">0%</span>
+          <button id="resetDuring" class="ml-auto text-xs text-rose-600 hover:underline">Сбросить раздел</button>
+        </div>
+        <h3 class="text-lg font-medium text-gray-800 mb-2">Что снимать</h3>
+        <ul id="list-during-shoot" class="rounded-lg border border-gray-100 divide-y divide-gray-100 mb-6"></ul>
+        <h3 class="text-lg font-medium text-gray-800 mb-2">Что делать в кадре</h3>
+        <ul id="list-during-act" class="rounded-lg border border-gray-100 divide-y divide-gray-100"></ul>
+      </div>
+
+      <!-- POST -->
+      <div id="panel-post" class="hidden fade-enter card p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-semibold text-rose-700 mb-4">После путешествия</h2>
+        <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+          <span>Прогресс</span>
+          <div class="w-40 h-2.5 rounded bg-gray-200 overflow-hidden"><div id="postBar" class="grad h-2.5" style="width:0%"></div></div>
+          <span id="postPct" class="tabular-nums">0%</span>
+          <button id="resetPost" class="ml-auto text-xs text-rose-600 hover:underline">Сбросить раздел</button>
+        </div>
+        <ul id="list-post" class="rounded-lg border border-gray-100 divide-y divide-gray-100"></ul>
+      </div>
+    </div>
+
+    <!-- Bottom controls -->
+    <div class="mt-6 flex justify-between items-center">
+      <button id="prevTab" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50" disabled>Назад</button>
+      <button id="resetAll" class="text-sm text-red-600 hover:text-red-800 hover:underline">Сбросить все отметки</button>
+      <button id="nextTab" class="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700">Вперед</button>
+    </div>
+
+    <footer class="mt-10 text-center text-xs text-gray-500">Сделано в стиле референса. Сохранение в localStorage.</footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  var storageKey = 'tguide_state_v2';
+  var tabs = ['pre','during','post'];
+  var labels = { pre:'До', during:'Во время', post:'После' };
+  var current = 'pre';
+  var checked = { pre:{}, duringShoot:{}, duringAct:{}, post:{} };
+
+  function load(){
+    try{
+      var s = JSON.parse(localStorage.getItem(storageKey)||'{}');
+      if(s && s.checked){ checked=s.checked }
+      if(s && s.current){ current=s.current }
+    }catch(e){}
+  }
+  function save(){ localStorage.setItem(storageKey, JSON.stringify({current:current, checked:checked})) }
+
+  // Data (ASCII only)
+  var pre = [
+    'Решить, какое видео хотите',
+    'Выставить настройки видео',
+    'Очистить память и подключить облако',
+    'Купить штатив и крепеж',
+    'Водонепроницаемый чехол',
+    'Ремешок на плечо',
+    'Внешний аккумулятор (пауэрбанк)',
+    'Если есть - взять другие камеры',
+    'Посмотреть урок по съемке',
+    'Купить страховку',
+    'Установить и обновить приложения',
+    'Загрузить оффлайн-карту',
+    'Подключить онлайн сим-карту',
+    'AirTag для багажа'
+  ];
+  var duringShoot = [
+    'Панорама места','Смех или эмоция на лице','Уличная вывеска или указатель','Еда (одна тарелка крупным планом)',
+    'Статичный кадр на 30 секунд - застывшее время','Закат или вечерние огни','Местный житель, который вас зацепил','Таймлапс улицы или города',
+    'Крупная деталь (ручка двери, фонарь, узор)','Утро: первые кадры города/природы','Дорога под ногами (асфальт, камни, трава)','Двери и окна (местная архитектура)',
+    'Уличное искусство или граффити','Погода: дождь, снег, туман, ветер','Местный транспорт (автобус, велосипед, лодка)','Животные (уличные кошки, собаки, птицы)',
+    'Музыканты или звуки улицы','Обычная витрина магазина или кафе','Местные деньги, чеки или мелочи','50 коротких видео (по 1-2 секунды)',
+    'Кадр, где почти ничего не происходит','Секретный ракурс - держите телефон необычно','Повторите один и тот же кадр утром и вечером','Интересная тень',
+    'Отражение на стекле или в воде','Используйте все камеры телефона (0.5x, 1x, 3x, 5x)'
+  ];
+  var duringAct = [
+    'Смотреть по сторонам','Реагировать на детали','Идти и оборачиваться','Ехать (велосипед, поезд, эскалатор)',
+    'Есть или пить - утро с кофе, ужин','Достать телефон/карту/билеты','Показать, что вокруг - рукой или взглядом','Поднять голову к небу / закрыть глаза и вдохнуть',
+    'Присесть, опереться, взаимодействовать с пространством','Остановиться и поймать момент','Рассказать на камеру мысли или эмоции','Просить друзей снимать моменты эмоций',
+    'Посмотреть в камеру и жестом позвать за собой','Пробежаться, если красивый пейзаж','Снять момент покупки (сувенир, еда, билет)','Танцевать или покрутиться на месте',
+    'Пройти сквозь толпу при статичной камере','Поднять бокал или чашку кофе в кадр','Зайти в дверь или выйти из здания','Пройтись по мосту или вдоль воды'
+  ];
+  var post = ['Собрать все исходники в одном месте','Отобрать кадры для видео','Выбрать музыку','Смонтировать и экспортировать финал','Сохранить: облако/диск/альбом'];
+
+  function buildList(rootId, items, bucket){
+    var root=document.getElementById(rootId); root.innerHTML='';
+    items.forEach(function(title,i){
+      var id=bucket+'_'+i; var li=document.createElement('li'); li.className='flex items-start gap-3 p-3 bg-white';
+      var input=document.createElement('input'); input.type='checkbox'; input.className='t-checkbox mt-1'; input.id=id; input.checked=!!(checked[bucket]&&checked[bucket][id]);
+      input.addEventListener('change',function(){ checked[bucket][id]=input.checked; save(); updateProgress(); });
+      var label=document.createElement('label'); label.setAttribute('for',id); label.className='cursor-pointer select-none flex-1'; label.textContent=title;
+      li.appendChild(input); li.appendChild(label); root.appendChild(li);
+    });
+  }
+
+  function count(obj){ return Object.values(obj||{}).filter(Boolean).length }
+  function updateProgress(){
+    var preDone=count(checked.pre), preTotal=pre.length;
+    var durDone=count(checked.duringShoot)+count(checked.duringAct), durTotal=duringShoot.length+duringAct.length;
+    var postDone=count(checked.post), postTotal=post.length;
+    var sumDone=preDone+durDone+postDone, sumTotal=preTotal+durTotal+postTotal;
+    document.getElementById('preBar').style.width=Math.round(preDone/preTotal*100)+'%';
+    document.getElementById('prePct').textContent=Math.round(preDone/preTotal*100)+'%';
+    document.getElementById('duringBar').style.width=Math.round(durDone/durTotal*100)+'%';
+    document.getElementById('duringPct').textContent=Math.round(durDone/durTotal*100)+'%';
+    document.getElementById('postBar').style.width=Math.round(postDone/postTotal*100)+'%';
+    document.getElementById('postPct').textContent=Math.round(postDone/postTotal*100)+'%';
+    document.getElementById('overallBar').style.width=Math.round(sumDone/sumTotal*100)+'%';
+    document.getElementById('overallPct').textContent=Math.round(sumDone/sumTotal*100)+'%';
+  }
+
+  function setActiveTab(tab){
+    current=tab; save();
+    ['pre','during','post'].forEach(function(t){
+      var btn=document.querySelector('[data-tab="'+t+'"]');
+      if(btn){ btn.className='pill px-4 py-2 text-sm font-medium '+(t===tab?'pill-active':'pill-idle') }
+      var p=document.getElementById('panel-'+t); if(p){ p.classList.toggle('hidden',t!==tab) }
+    });
+    document.getElementById('prevTab').disabled=(tab==='pre');
+    document.getElementById('nextTab').disabled=(tab==='post');
+  }
+
+  // Events
+  function initEvents(){
+    document.querySelectorAll('[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ setActiveTab(b.getAttribute('data-tab')); }); });
+    document.getElementById('prevTab').addEventListener('click',function(){ var i=tabs.indexOf(current); if(i>0) setActiveTab(tabs[i-1]) });
+    document.getElementById('nextTab').addEventListener('click',function(){ var i=tabs.indexOf(current); if(i<tabs.length-1) setActiveTab(tabs[i+1]) });
+    document.getElementById('resetAll').addEventListener('click',function(){ if(confirm('Сбросить все отметки?')){ checked={ pre:{}, duringShoot:{}, duringAct:{}, post:{} }; save(); updateProgress(); } });
+    document.getElementById('resetPre').addEventListener('click',function(){ checked.pre={}; save(); updateProgress(); });
+    document.getElementById('resetDuring').addEventListener('click',function(){ checked.duringShoot={}; checked.duringAct={}; save(); updateProgress(); });
+    document.getElementById('resetPost').addEventListener('click',function(){ checked.post={}; save(); updateProgress(); });
+  }
+
+  // Init
+  load();
+  buildList('list-pre',pre,'pre');
+  buildList('list-during-shoot',duringShoot,'duringShoot');
+  buildList('list-during-act',duringAct,'duringAct');
+  buildList('list-post',post,'post');
+  updateProgress();
+  initEvents();
+  setActiveTab(current);
+})();
+</script>
